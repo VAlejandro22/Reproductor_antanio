@@ -7,19 +7,22 @@ import { twMerge } from 'tailwind-merge';
 //icons
 import { HiHome } from 'react-icons/hi';
 import { BiSearch } from 'react-icons/bi';
+import { TfiAlignCenter } from "react-icons/tfi";
 //components
 import Box from './Box';
 import SidebarItem from './SidebarItem';
 import Library from './Library';
-import { Song } from '@/types';
+import Genres from './Genres';
+import { Song,Genre } from '@/types';
 import usePlayer from '@/hooks/usePlayer';
 
 interface SidebarProps {
   children: React.ReactNode;
   songs: Song[];
+  genres: Genre[];
 }
 
-const Sidebar: React.FC<SidebarProps> = ({ children, songs }) => {
+const Sidebar: React.FC<SidebarProps> = ({ children, songs, genres }) => {
   const pathname = usePathname();
   const player = usePlayer();
 
@@ -32,10 +35,16 @@ const Sidebar: React.FC<SidebarProps> = ({ children, songs }) => {
         icon: HiHome,
       },
       {
-        label: 'Search',
+        label: 'Buscar',
         active: pathname === '/search',
         href: '/search',
         icon: BiSearch,
+      },
+      {
+        label: 'Todos los generos',
+        active: pathname === '/allgenres',
+        href: '/allgenres',
+        icon: TfiAlignCenter ,
       },
     ],
     [pathname]
@@ -53,6 +62,11 @@ const Sidebar: React.FC<SidebarProps> = ({ children, songs }) => {
             {routes.map((item) => (
               <SidebarItem key={item.label} {...item} />
             ))}
+          </div>
+        </Box>
+        <Box className="overflow-y-auto h-full">
+          <div>
+            <Genres genres={genres} />
           </div>
         </Box>
         <Box className="overflow-y-auto h-full">

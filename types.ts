@@ -9,7 +9,16 @@ export interface Song {
   image_path: string;
 }
 
+export interface Genre{
+  id: number;
+  name: string;
+  start_year: number;
+  end_year: number;
+  image_path: string;
+}
+
 export interface UserDetails {
+  birth_year: null;
   id: string;
   first_name: string;
   last_name: string;

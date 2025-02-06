@@ -1,7 +1,8 @@
-import getSongs from '@/actions/getSongs';
+
+
 import Header from '@/components/Header';
 import ListItem from '@/components/ListItem';
-import PageContent from './components/PageContent';
+
 import getGenresbyUserID from '@/actions/getGenresbyUserID';
 
 import AllGenres from '@/app/allgenres/components/AllGenres';
@@ -9,13 +10,23 @@ export const revalidate = 0;
 
 export default async function Home() {
   const genres = await getGenresbyUserID();
- 
   const currentTime = new Date();
   const hour = currentTime.getHours();
 
   let partOfDay;
 
   
+  const onClick = () => {
+    // if (!user) {
+    //   return authModal.onOpen();
+    // }
+    // // if (genres.length >= 1 && !subscription) {
+    // //   return subscribeModal.onOpen();
+    // // }
+
+    // return uploadModal.onOpen();
+  };
+
 
   if (hour >= 5 && hour < 12) {
     partOfDay = 'Buenos dias';

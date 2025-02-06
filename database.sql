@@ -1,4 +1,43 @@
 /**
+ * SONGS
+ * This table stores information about songs uploaded by users.
+ */
+create table songs (
+  id serial primary key,
+  title text not null,
+  author text,
+  created_at timestamp with time zone default timezone('utc'::text, now()),
+  image_path text,
+  song_path text,
+  user_id uuid references auth.users not null
+);
+alter table songs
+  enable row level security;
+create policy "Can view own songs." on songs
+  for select using (auth.uid() = user_id);
+create policy "Can insert and update own songs." on songs
+  for insert, update using (auth.uid() = user_id);
+
+/**
+ * LIKED_SONGS
+ * This table stores the songs that users have liked.
+ */
+create table liked_songs (
+  id serial primary key,
+  created_at timestamp with time zone default timezone('utc'::text, now()),
+  song_id integer references songs(id) not null,
+  user_id uuid references auth.users not null
+);
+alter table liked_songs
+  enable row level security;
+create policy "Can view own liked songs." on liked_songs
+  for select using (auth.uid() = user_id);
+create policy "Can insert own liked songs." on liked_songs
+  for insert using (auth.uid() = user_id);
+
+
+
+/**
 * USERS
 * Note: This table contains user data. Users should only be able to view and update their own data.
 */

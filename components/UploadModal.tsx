@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useForm, FieldValues, SubmitHandler } from 'react-hook-form';
 import { toast } from 'react-hot-toast';
@@ -13,9 +13,18 @@ import Modal from './Modal';
 import Input from './Input';
 import Button from './Button';
 
-const UploadModal = () => {
+// Función para obtener géneros de la base de datos
+import getGenres from '@/actions/getGenres';
+import { Genre } from '@/types';
+
+interface UploadModalProps {
+  genres: Genre[];
+}
+
+const UploadModal: React.FC<UploadModalProps> = ({ genres }) => {
   const uploadModal = useUploadModal();
   const [isLoading, setisLoading] = useState(false);
+
   const { user } = useUser();
   const supabaseClient = useSupabaseClient();
   const router = useRouter();
@@ -24,10 +33,13 @@ const UploadModal = () => {
     defaultValues: {
       author: '',
       title: '',
+      genreId: '', // Añadido para el género
       song: null,
       image: null,
     },
   });
+
+  
 
   const onChange = (open: boolean) => {
     if (!open) {
@@ -41,14 +53,16 @@ const UploadModal = () => {
       setisLoading(true);
       const imageFile = values.image?.[0];
       const songFile = values.song?.[0];
+      const genreId = values.genreId; // ID del género seleccionado
 
-      if (!imageFile || !songFile || !user) {
+      if (!imageFile || !songFile || !user || !genreId) {
         toast.error('Missing fields');
         return;
       }
+
       const uniqId = uniqid();
 
-      //upload song
+      // Subir canción
       const { data: songData, error: songError } = await supabaseClient.storage
         .from('songs')
         .upload(`song-${values.title}-${uniqId}`, songFile, {
@@ -58,9 +72,11 @@ const UploadModal = () => {
 
       if (songError) {
         setisLoading(false);
+        console.log(songError);
         return toast.error('Failed song upload');
       }
 
+      // Subir imagen
       const { data: imageData, error: imageError } =
         await supabaseClient.storage
           .from('images')
@@ -68,17 +84,20 @@ const UploadModal = () => {
             cacheControl: '3600',
             upsert: false,
           });
+
       if (imageError) {
         setisLoading(false);
         return toast.error('Failed image upload');
       }
 
+      // Guardar en la base de datos
       const { error: supabaseError } = await supabaseClient
         .from('songs')
         .insert({
           user_id: user.id,
           title: values.title,
           author: values.author,
+          genre_id: genreId, // Guardar el ID del género
           image_path: imageData.path,
           song_path: songData.path,
         });
@@ -87,6 +106,7 @@ const UploadModal = () => {
         setisLoading(false);
         return toast.error(supabaseError.message);
       }
+
       router.refresh();
       setisLoading(false);
       toast.success('Song created!');
@@ -107,7 +127,7 @@ const UploadModal = () => {
       onChange={onChange}
     >
       <form
-        className="flex  flex-col gap-y-4"
+        className="flex flex-col gap-y-4"
         onSubmit={handleSubmit(onSubmit)}
       >
         <Input
@@ -122,7 +142,25 @@ const UploadModal = () => {
           {...register('author', { required: true })}
           placeholder="Artist Name"
         />
-        <div className="pb-1">
+        <div>
+          <label htmlFor="genreId" className="block text-sm text-neutral-400">
+            Select a genre
+          </label>
+          <select
+            id="genreId"
+            disabled={isLoading}
+            {...register('genreId', { required: true })}
+            className="w-full bg-neutral-800 text-white p-2 rounded-md"
+          >
+            <option value="">-- Select Genre --</option>
+            {genres.map((genre) => (
+              <option key={genre.id} value={genre.id}>
+                {genre.name}
+              </option>
+            ))}
+          </select>
+        </div>
+        <div>
           <div>Select a song file</div>
           <Input
             type="file"
@@ -132,7 +170,7 @@ const UploadModal = () => {
             accept=".mp3"
           />
         </div>
-        <div className="pb-1">
+        <div>
           <div>Select an image</div>
           <Input
             type="file"

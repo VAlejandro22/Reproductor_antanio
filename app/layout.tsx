@@ -9,7 +9,8 @@ import ToasterProvider from '@/providers/ToasterProvider';
 import getSongsbyUserID from '@/actions/getSongsbyUserID';
 import Player from '@/components/Player';
 import getActiveProductwithPrices from '@/actions/getActiveProductwithPrices';
-
+import getGenresbyUserID from '@/actions/getGenresbyUserID';
+import getGenres from '@/actions/getGenres';
 const font = Figtree({ subsets: ['latin'] });
 
 export const metadata = {
@@ -25,15 +26,17 @@ export default async function RootLayout({
   children: React.ReactNode;
 }) {
   const userSongs = await getSongsbyUserID();
+  const userGenres = await getGenresbyUserID();
   const products = await getActiveProductwithPrices();
+  const genres = await getGenres();
   return (
     <html lang="en">
       <body className={font.className}>
         <ToasterProvider />
         <SupabaseProvider>
           <UserProvider>
-            <ModalProvider products={products} />
-            <Sidebar songs={userSongs}>{children}</Sidebar>
+            <ModalProvider products={products} genres={genres} />
+            <Sidebar songs={userSongs} genres={userGenres}>{children}</Sidebar>
             <Player />
           </UserProvider>
         </SupabaseProvider>

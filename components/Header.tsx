@@ -40,16 +40,18 @@ const Header: React.FC<HeaderProps> = ({ children, className }) => {
     }
   };
 
-  console.log(user?.user_metadata.avatar_url);
 
+  
   return (
     <div
       className={twMerge(
-        `h-fit bg-gradient-to-b to-emerald-800 from-blue-800 p-6 `,
+        // `h-fit bg-gradient-to-b to-[#c2a45c] from-[#ae8625] p-6 `,
+        `h-fit bg-[url('/images/adulto.jpg')]  md:bg-[url('/images/mano_disco.jpg')] bg-cover md:bg-fixed bg:center md:bg-[0%_90%]  p-6 `,
         className
       )}
     >
-      <div className="w-full mb-4 flex items-center  justify-between">
+      {/* <div className="absolute inset-0 bg-black bg-opacity-50 z-0"></div> */}
+      <div className="w-full mb-4 flex items-center  justify-between ">
         <div className="hidden md:flex items-center gap-x-2">
           <button
             onClick={() => router.back()}
@@ -67,13 +69,13 @@ const Header: React.FC<HeaderProps> = ({ children, className }) => {
         <div className="flex md:hidden gap-x-2 items-center">
           <button
             className="rounded-full p-2 bg-white flex items-center justify-center hover:opacity-75 transition"
-            onClick={() => {}}
+            onClick={() => {router.push('/')}}
           >
             <HiHome className="text-black" size={20} />
           </button>
           <button
             className="rounded-full p-2 bg-white flex items-center justify-center hover:opacity-75 transition"
-            onClick={() => {}}
+            onClick={() => {router.push('/search')}}
           >
             <BiSearch className="text-black" size={20} />
           </button>
